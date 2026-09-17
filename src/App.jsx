@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import HeroBanner from './components/HeroBanner';
 import SearchBar from './components/SearchBar';
@@ -6,7 +6,7 @@ import MovieGrid from './components/MovieGrid';
 import MovieDetailsModal from './components/MovieDetailsModal';
 import Footer from './components/Footer';
 import { fetchShows, searchShows } from './api/tvmaze';
-import { Film, Flame, Sparkles } from 'lucide-react';
+import { Flame } from 'lucide-react';
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -22,61 +22,45 @@ export default function App() {
 
   const searchInputRef = useRef(null);
 
-  // Load initial shows on mount
-  const loadInitialShows = async () => {
+  const loadInitialShows = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const data = await fetchShows(0);
-      setShows(data);
-    } catch (err) {
-      console.error(err);
-      setError('Unable to connect to movie database. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadInitialShows();
+    const data = await fetchShows(0);
+    setShows(data);
+    setLoading(false);
   }, []);
 
-  // Handle Search Input Debounce
   useEffect(() => {
-    let timer;
-    if (searchTerm.trim() !== '') {
+    fetchShows(0).then(data => {
+      setShows(data);
+      setLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    const query = searchTerm.trim();
+    if (!query) return;
+
+    const timer = setTimeout(async () => {
       setLoading(true);
       setError(null);
-      timer = setTimeout(async () => {
-        try {
-          const results = await searchShows(searchTerm);
-          setShows(results);
-        } catch (err) {
-          console.error(err);
-          setError('Failed to fetch search results. Please check your query.');
-        } finally {
-          setLoading(false);
-        }
-      }, 350);
-    } else if (!loading && shows.length === 0) {
-      loadInitialShows();
-    }
+      const results = await searchShows(query);
+      setShows(results);
+      setLoading(false);
+    }, 350);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Filtered & Sorted Shows
   const filteredShows = useMemo(() => {
     let result = [...shows];
 
-    // Filter by genre
     if (selectedGenre !== 'All') {
       result = result.filter(show => 
-        show.genres && show.genres.some(g => g.toLowerCase() === selectedGenre.toLowerCase())
+        show.genres?.some(g => g.toLowerCase() === selectedGenre.toLowerCase())
       );
     }
 
-    // Sort shows
     if (sortBy === 'rating') {
       result.sort((a, b) => {
         const rA = a.rating !== 'N/A' ? parseFloat(a.rating) : 0;
@@ -85,8 +69,8 @@ export default function App() {
       });
     } else if (sortBy === 'year') {
       result.sort((a, b) => {
-        const yA = a.year !== 'N/A' ? parseInt(a.year) : 0;
-        const yB = b.year !== 'N/A' ? parseInt(b.year) : 0;
+        const yA = a.year !== 'N/A' ? parseInt(a.year, 10) : 0;
+        const yB = b.year !== 'N/A' ? parseInt(b.year, 10) : 0;
         return yB - yA;
       });
     } else if (sortBy === 'title') {
@@ -96,7 +80,6 @@ export default function App() {
     return result;
   }, [shows, selectedGenre, sortBy]);
 
-  // Featured top rated shows for Home Page
   const featuredShows = useMemo(() => {
     return [...shows]
       .filter(s => s.rating !== 'N/A' && s.poster)
@@ -111,7 +94,6 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Header / Navigation */}
       <Navbar 
         activeView={activeView} 
         setActiveView={setActiveView}
@@ -123,10 +105,8 @@ export default function App() {
       <main className="main-content">
         {activeView === 'home' ? (
           <>
-            {/* Landing Hero Section */}
             <HeroBanner onExploreClick={handleExploreClick} />
 
-            {/* Featured / Trending Movies Section */}
             <div className="container" style={{ paddingBottom: '4rem' }}>
               <div className="section-header">
                 <h2 className="section-title">
@@ -148,7 +128,6 @@ export default function App() {
             </div>
           </>
         ) : (
-          /* Movie Listing Page */
           <div className="container" style={{ paddingTop: '1rem' }}>
             <SearchBar 
               searchTerm={searchTerm}
@@ -171,7 +150,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Details Modal */}
       {selectedShow && (
         <MovieDetailsModal 
           show={selectedShow} 
@@ -179,8 +157,8 @@ export default function App() {
         />
       )}
 
-      {/* Footer */}
       <Footer onNavigate={setActiveView} />
     </div>
   );
 }
+

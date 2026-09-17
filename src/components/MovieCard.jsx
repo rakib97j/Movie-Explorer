@@ -1,8 +1,9 @@
-import React from 'react';
-import { Star, Calendar, Info, Film } from 'lucide-react';
+import { Star, Calendar, Info } from 'lucide-react';
+
+const FALLBACK_POSTER = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80';
 
 export default function MovieCard({ show, onSelectShow }) {
-  const posterUrl = show.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80';
+  const posterUrl = show.poster || FALLBACK_POSTER;
 
   return (
     <div className="movie-card">
@@ -14,7 +15,7 @@ export default function MovieCard({ show, onSelectShow }) {
           loading="lazy"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80';
+            e.target.src = FALLBACK_POSTER;
           }}
         />
         <div className="card-rating-badge">
@@ -39,7 +40,7 @@ export default function MovieCard({ show, onSelectShow }) {
             )}
           </div>
 
-          {show.genres && show.genres.length > 0 && (
+          {show.genres?.length > 0 && (
             <div className="card-genres">
               {show.genres.slice(0, 2).map((genre, idx) => (
                 <span key={idx} className="genre-tag">{genre}</span>
@@ -59,3 +60,4 @@ export default function MovieCard({ show, onSelectShow }) {
     </div>
   );
 }
+

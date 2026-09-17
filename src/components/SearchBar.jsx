@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, X, SlidersHorizontal } from 'lucide-react';
 
 const GENRES = [
@@ -32,7 +31,7 @@ export default function SearchBar({
           <input
             type="text"
             className="search-input"
-            placeholder="Search for a movie or TV show title (e.g. Girls, Batman, Office)..."
+            placeholder="Search by title (e.g. Breaking Bad, Batman, Office)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -48,7 +47,6 @@ export default function SearchBar({
         </div>
 
         <div className="filters-bar">
-          {/* Genre Filters */}
           <div className="genre-pills">
             {GENRES.map((genre) => (
               <button
@@ -61,32 +59,22 @@ export default function SearchBar({
             ))}
           </div>
 
-          {/* Results count & Sort */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="filters-right">
             <span className="results-meta">
-              Showing <strong>{resultsCount}</strong> titles
+              <strong>{resultsCount}</strong> titles found
             </span>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <div className="sort-wrapper">
               <SlidersHorizontal size={15} color="var(--text-muted)" />
               <select
+                className="sort-select"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)',
-                  padding: '0.4rem 0.6rem',
-                  fontSize: '0.85rem',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
               >
                 <option value="default">Default Sort</option>
-                <option value="rating">⭐ Top Rated</option>
-                <option value="year">📅 Newest First</option>
-                <option value="title">🔤 Title (A-Z)</option>
+                <option value="rating">Top Rated</option>
+                <option value="year">Newest First</option>
+                <option value="title">Title (A-Z)</option>
               </select>
             </div>
           </div>
@@ -95,3 +83,4 @@ export default function SearchBar({
     </div>
   );
 }
+

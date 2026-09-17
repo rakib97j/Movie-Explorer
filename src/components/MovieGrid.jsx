@@ -1,6 +1,5 @@
-import React from 'react';
 import MovieCard from './MovieCard';
-import { Film, RefreshCw, AlertCircle } from 'lucide-react';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 
 export default function MovieGrid({ shows, loading, error, onSelectShow, onRetry }) {
   if (loading) {
@@ -31,8 +30,8 @@ export default function MovieGrid({ shows, loading, error, onSelectShow, onRetry
     return (
       <div className="empty-state">
         <AlertCircle className="empty-icon" />
-        <h3 className="empty-title">No movies found</h3>
-        <p className="empty-subtitle">We couldn't find any title matching your query. Try searching for something else!</p>
+        <h3 className="empty-title">No titles found</h3>
+        <p className="empty-subtitle">We couldn't find anything matching your query. Try searching for something else!</p>
       </div>
     );
   }
@@ -49,3 +48,4 @@ export default function MovieGrid({ shows, loading, error, onSelectShow, onRetry
     </div>
   );
 }
+

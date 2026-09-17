@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Film, Search, Menu, X, Compass } from 'lucide-react';
+import { useState } from 'react';
+import { Film, Menu, X, Compass } from 'lucide-react';
 
 export default function Navbar({ activeView, setActiveView, onSearchClick }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,7 +13,6 @@ export default function Navbar({ activeView, setActiveView, onSearchClick }) {
   return (
     <nav className="navbar">
       <div className="container nav-container">
-        {/* Logo */}
         <a href="#home" className="brand-logo" onClick={() => handleNavClick('home')}>
           <div className="logo-icon">
             <Film size={22} />
@@ -23,7 +22,6 @@ export default function Navbar({ activeView, setActiveView, onSearchClick }) {
           </div>
         </a>
 
-        {/* Navigation items */}
         <ul className={`nav-menu ${mobileMenuOpen ? 'open' : ''}`}>
           <li>
             <button
@@ -43,7 +41,6 @@ export default function Navbar({ activeView, setActiveView, onSearchClick }) {
           </li>
         </ul>
 
-        {/* Actions */}
         <div className="nav-actions">
           <button 
             className="btn btn-primary"
@@ -68,3 +65,4 @@ export default function Navbar({ activeView, setActiveView, onSearchClick }) {
     </nav>
   );
 }
+

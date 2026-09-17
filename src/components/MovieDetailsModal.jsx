@@ -1,42 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { X, Star, Calendar, Clock, Globe, Tv, User, ExternalLink, Award } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Star, Calendar, Clock, Globe, ExternalLink } from 'lucide-react';
 import { fetchShowDetails } from '../api/tvmaze';
+
+const FALLBACK_POSTER = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80';
+const FALLBACK_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
 
 export default function MovieDetailsModal({ show, onClose }) {
   const [details, setDetails] = useState(show);
-  const [loadingDetails, setLoadingDetails] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-    if (show && show.id) {
-      setLoadingDetails(true);
-      fetchShowDetails(show.id)
-        .then(data => {
-          if (isMounted) {
-            setDetails(data);
-            setLoadingDetails(false);
-          }
-        })
-        .catch(err => {
-          console.error("Failed to load embedded details:", err);
-          if (isMounted) setLoadingDetails(false);
-        });
+    let active = true;
+    if (show?.id) {
+      fetchShowDetails(show.id).then(data => {
+        if (active && data) setDetails(data);
+      });
     }
 
-    // Body scroll lock
     document.body.classList.add('modal-open');
 
-    // Keydown ESC handler
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
 
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      isMounted = false;
+      active = false;
       document.body.classList.remove('modal-open');
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -45,24 +34,21 @@ export default function MovieDetailsModal({ show, onClose }) {
   if (!show) return null;
 
   const currentData = details || show;
-  const posterUrl = currentData.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80';
+  const posterUrl = currentData.poster || FALLBACK_POSTER;
   const backdropUrl = currentData.backdrop || posterUrl;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Close Button */}
-        <button className="modal-close-btn" onClick={onClose} aria-label="Close details">
+        <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
           <X size={20} />
         </button>
 
-        {/* Modal Backdrop Banner */}
         <div className="modal-hero">
           <img src={backdropUrl} alt={currentData.name} className="modal-backdrop-img" />
-          <div className="modal-hero-overlay"></div>
+          <div className="modal-hero-overlay" />
         </div>
 
-        {/* Modal Body */}
         <div className="modal-body">
           <div className="modal-header-grid">
             <img src={posterUrl} alt={currentData.name} className="modal-poster" />
@@ -89,7 +75,7 @@ export default function MovieDetailsModal({ show, onClose }) {
                 )}
               </div>
 
-              {currentData.genres && currentData.genres.length > 0 && (
+              {currentData.genres?.length > 0 && (
                 <div className="modal-genres">
                   {currentData.genres.map((genre, idx) => (
                     <span key={idx} className="modal-genre-badge">{genre}</span>
@@ -99,7 +85,6 @@ export default function MovieDetailsModal({ show, onClose }) {
             </div>
           </div>
 
-          {/* Overview / Summary */}
           <div className="modal-section">
             <h3 className="modal-section-title">Overview</h3>
             <p className="modal-summary">
@@ -107,7 +92,6 @@ export default function MovieDetailsModal({ show, onClose }) {
             </p>
           </div>
 
-          {/* Key Details Grid */}
           <div className="modal-details-grid">
             <div>
               <div className="detail-box-label">Language</div>
@@ -132,15 +116,14 @@ export default function MovieDetailsModal({ show, onClose }) {
             </div>
           </div>
 
-          {/* Cast Overview (if fetched) */}
-          {currentData.cast && currentData.cast.length > 0 && (
+          {currentData.cast?.length > 0 && (
             <div className="modal-section">
-              <h3 className="modal-section-title">Main Cast</h3>
+              <h3 className="modal-section-title">Cast</h3>
               <div className="cast-list">
                 {currentData.cast.slice(0, 8).map((actor, idx) => (
                   <div key={idx} className="cast-card">
                     <img 
-                      src={actor.image || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'} 
+                      src={actor.image || FALLBACK_AVATAR} 
                       alt={actor.person} 
                       className="cast-img"
                     />
@@ -152,7 +135,6 @@ export default function MovieDetailsModal({ show, onClose }) {
             </div>
           )}
 
-          {/* Modal Actions Footer */}
           <div className="modal-footer">
             {currentData.officialSite && (
               <a 
@@ -177,3 +159,4 @@ export default function MovieDetailsModal({ show, onClose }) {
     </div>
   );
 }
+

@@ -1,5 +1,4 @@
-import React from 'react';
-import { Film, Globe, Heart } from 'lucide-react';
+import { Film } from 'lucide-react';
 
 export default function Footer({ onNavigate }) {
   return (
@@ -27,9 +26,10 @@ export default function Footer({ onNavigate }) {
         </ul>
 
         <p className="footer-copy">
-          © 2026 MovieExplorer. Built with React & TVMaze API. All rights reserved.
+          © {new Date().getFullYear()} MovieExplorer. Powered by TVMaze API.
         </p>
       </div>
     </footer>
   );
 }
+
